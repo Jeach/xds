@@ -46,9 +46,9 @@ the data.
 
 Example replication configuration for the "MyDomain:SomeUser" model:
 
- > 1 replication in group "NorthAmerica" and in zone "Zone 1".
- > 1 replication in group "NorthAmerica" and in zone "Zone 2".
- > 1 replication in group "Europe" and in zone "\*" (meaning "any" zone such that it will be determined by the system).
+ >> 1 replication in group "NorthAmerica" and in zone "Zone 1"
+ >> 1 replication in group "NorthAmerica" and in zone "Zone 2"
+ >> 1 replication in group "Europe" and in zone "\*" (meaning "any" zone such that it will be determined by the system)
 
 ASYNC/Even-Driven API
 -----------------------------------------------------------------------------------------------------------

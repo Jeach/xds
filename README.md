@@ -14,7 +14,8 @@ Each model is governed by a "Domain:ModelName" naming scheme allowing for a uniq
 
 All models have a "named" set of properties where each property consists of a type and value. In addition,
 meta-data provides additional information for the model and for properties (ie: indexing and enhabced string
-support, etc). When creating models, you can also define default values for each data type.
+support, etc). When creating models, you can also define default values for each data type. All model 
+references are made via ID references. It is also very easy to associate a collection of references.
 
 The simplistic approach here basically illiminates boilerplate code (DAO's and DTO's, etc).
 
@@ -71,13 +72,24 @@ for a very powerful event system. For example, should one want to know if/when a
 for the "Player" model, a "create" event can be registered on "SomeGame:Player:\*". Every instance created
 (server side) would trigger all registered event handlers on every client.
 
+Model Leasing Framework
+-----------------------------------------------------------------------------------------------------------
+Also provide support for "leasing" models for a given timeframe. So if client 1 is currently displaying
+a user model ID 1234, they can register such model on the "lease request" event. If client 2 requests to
+"lease" user model ID 1234, client 1 will receive the event and can either prevent the user from clicking
+an edit button or provide a user feedback that the even is being edited by someone else. Should client 1
+allow the user to click on the edit button, thus invoking a "lease request" on model 1234, the server
+would refuse such request. Should the client implementation allow the user to edit model 1234 and send
+an model "update" request, the server will reject and refuse such update because the model is currently
+under a lease. A lease has a determined auto-expiry, either using default config or during a lease request.
+
 RBAC
 -----------------------------------------------------------------------------------------------------------
 Full "Role Based Access & Control" support is built into the datbase framework, providing for fine-grained
 permission control over who can access and do what to each domain, model family, model instance or even
 a model's properties.
 
-Flexible, Multi-Level Cacheing
+Flexible, Multi-Level Caching
 -----------------------------------------------------------------------------------------------------------
 Built-in per-model caching can be provided for each client configuration and easily configurable on the
 server as well. This allows client code to fully optimize at the client-level and also allows for servers
@@ -85,9 +97,13 @@ to provide cache optimizations as required without having to provide any code.
 
 API Options
 -----------------------------------------------------------------------------------------------------------
-Every CRUD-QX API can receive an optional "options" argument when making a call. These options are very
-simple key/value options which allow to fine-tune the call. This alone is very powerful and provides a ton
-of functionalities, such as (to only list a few):
+Every CRUD-QX API can receive an optional "options" argument when making a call. These options are very simple key/value options which allow to fine-tune the call. This alone is very powerful and provides a ton of functionalities, such as (to only list a few):
+
+Proxy model - When a model has one or more properties which have a one-to-many reference to another model, you can indicate to the server that the model can be sent back to the client without resolving the foreign ID's. This may be useful in cases where the actual reference ID's are not pertinent for the current purpose of the request in which case they will not be sent back to the client. Or in a case where they are required but can be lazy-loaded, the server will send the ID's to the client as a subsequent delayed response. This can dramatically speed up the application. When a model has not been fully resolved on the client-side, it is considered to be a "proxy model", meaning some parts of the model are missing.
+
+Model Dependencies - When a model has one or more properties which references another model, by default only the ID (or ID's) are returned with the model. At times, one may wish to indicate to the server which property references are to be resolved as distinct and seperate models and sent back to the client. This can be configured on a per-property basis
+
+resolve: property1:max=5:tx=atomic, property2:tx=delayed:max=5
 
 * Request one or more model-dependencies, in an eager or lazy fasion
 * Execute queries in an eager or lazy transaction

@@ -1,2 +1,2 @@
 # xds
-XDS 
+XDS means "Unamed" Database System.
